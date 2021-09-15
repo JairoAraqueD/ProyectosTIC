@@ -1,0 +1,58 @@
+Instalación Global del EF
+•	dotnet tool install --global dotnet-ef
+•	dotnet tool update --global dotnet-ef
+
+Instalación por cada Proyecto que utilizará el EF 
+•	dotnet add package Microsoft.EntityFrameworkCore --version 5.0.0
+•	dotnet add package Microsoft.EntityFrameworkCore.Tools --version 5.0.0
+•	dotnet add package Microsoft.EntityFrameworkCore.Design --version 5.0.0
+•	dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 5.0.0
+
+Configuración Migraciones
+
+Cuando estoy en el proyecto donde esta el Main / Program
+	No hay migraciones
+		•	dotnet ef migrations add Inicial --startup-project ..\HospiEnCasa.App.Consola\
+	Ya hay migraciones
+		•	dotnet ef database update --startup-project ..\HospiEnCasa.App.Consola\
+
+Cuando no estoy en el proyecto donde esta el Main / Program
+	No hay migraciones
+		•	dotnet ef database update  --startup-project ..\ConsoleApp\
+	Ya hay migraciones
+		•	dotnet ef migrations add Init --startup-project ..\ConsoleApp\
+
+Clase AppContext.cs
+
+using Microsoft.EntityFrameworkCore;
+
+namespace HospiEnCasa.App.Persistencia
+{
+   public class AppContext : DbContext
+   {
+       public DbSet<Persona> Personas {get;set;}
+   }   
+}
+
+
+using Microsoft.EntityFrameworkCore;
+using HospiEnCasa.App.Dominio;
+
+namespace HospiEnCasa.App.Persistencia
+{
+   public class AppContext : DbContext
+   {
+       public DbSet<Persona> Personas {get;set;}
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+       {
+           if (!optionsBuilder.IsConfigured)
+           {
+               optionsBuilder
+               .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = HospiEnCasaData");
+           }
+       }
+   }   
+}
+
+dotnet add reference ..\HospiEnCasa.App.Dominio\
+dotnet add reference ..\HospiEnCasa.App.Persistencia\
